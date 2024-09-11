@@ -96,8 +96,8 @@ kubectl apply -f calico.yaml
 # Function to check if all pods are running
 function check_pods_running {
   while true; do
-    # Check if all pods are in running state
-    if kubectl get pods --all-namespaces --no-headers | awk '{print $4}' | grep -v 'Running' >/dev/null 2>&1; then
+    # Check if any pods are not in running state
+    if kubectl get pods --all-namespaces --no-headers | awk '{print $4}' | grep -v 'Running' > /dev/null 2>&1; then
       echo "Waiting for all pods to be in 'Running' state..."
       sleep 10
     else
@@ -107,12 +107,15 @@ function check_pods_running {
   done
 }
 
-# Call the function to wait for pods to be running
-check_pods_running
+# Start a background process to monitor the pod status and print the join command when ready
+(
+  check_pods_running
+  echo "All pods are running!"
+  
+  # Print the kubeadm join command after pods are running
+  echo "Use the following command to join worker nodes to the cluster:"
+  grep -A2 "kubeadm join" kubeadm-init.log
+) &
 
-# Stop the kubectl watch process after all pods are running
-killall kubectl
-
-# Print the kubeadm join command after pods are running
-echo "Use the following command to join worker nodes to the cluster:"
-grep -A2 "kubeadm join" kubeadm-init.log
+# In parallel, display the kubectl get pods with watch mode until the background process finishes
+kubectl get pods --all-namespaces -w
