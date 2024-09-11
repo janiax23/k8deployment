@@ -82,7 +82,7 @@ EOF'
 # Download and apply Calico network plugin
 wget https://raw.githubusercontent.com/projectcalico/calico/master/manifests/calico.yaml
 
-# Initialize Kubernetes master
+# Initialize Kubernetes master and save output to kubeadm-init.log
 sudo kubeadm init --kubernetes-version 1.27.14 | tee kubeadm-init.log
 
 # Set up local kubeconfig for kubectl to interact with the cluster
@@ -109,6 +109,9 @@ function check_pods_running {
 
 # Call the function to wait for pods to be running
 check_pods_running
+
+# Stop the kubectl watch process after all pods are running
+killall kubectl
 
 # Print the kubeadm join command after pods are running
 echo "Use the following command to join worker nodes to the cluster:"
