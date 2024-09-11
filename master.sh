@@ -7,6 +7,9 @@ sudo apt upgrade -y
 # Install required packages
 sudo apt install -y apt-transport-https ca-certificates curl software-properties-common gnupg
 
+# Modify the needrestart configuration to auto-restart services after updates
+sudo sed -i 's/#$nrconf{restart} = '"'"'i'"'"';/$nrconf{restart} = '"'"'a'"'"';/g' /etc/needrestart/needrestart.conf
+
 # Disable swap immediately (required by Kubernetes)
 sudo swapoff -a
 
@@ -107,15 +110,18 @@ function check_pods_running {
   done
 }
 
-# Start a background process to monitor the pod status and print the join command when ready
-(
-  check_pods_running
-  echo "All pods are running!"
-  
-  # Print the kubeadm join command after pods are running
-  echo "Use the following command to join worker nodes to the cluster:"
-  grep -A2 "kubeadm join" kubeadm-init.log
-) &
+# Start kubectl get pods in watch mode in the background and capture its PID
+kubectl get pods --all-namespaces -w &
+KUBECTL_PID=$!
 
-# In parallel, display the kubectl get pods with watch mode until the background process finishes
-kubectl get pods --all-namespaces -w
+# Call the function to wait for pods to be running
+check_pods_running
+
+# Stop the kubectl watch process after all pods are running
+kill $KUBECTL_PID
+
+# Print the kubeadm join command after pods are running
+echo "Use the following command to join worker nodes to the cluster:"
+grep -A2 "kubeadm join" kubeadm-init.log
+
+# Return to the prompt
