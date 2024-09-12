@@ -83,9 +83,8 @@ sudo bash -c 'cat <<EOF > /etc/hosts
 EOF'
 
 # Download and apply Calico network plugin
-wget https://github.com/projectcalico/calico/releases/download/v3.27.3/release-v3.27.3.tgz
-tar -xvzf release-v3.27.3.tgz
-kubectl apply -f release-v3.27.3/manifests/calico.yaml
+wget https://raw.githubusercontent.com/projectcalico/calico/master/manifests/calico.yaml
+kubectl apply -f calico.yaml
 
 # Initialize Kubernetes master and save output to kubeadm-init.log
 sudo kubeadm init --kubernetes-version 1.27.14 | tee kubeadm-init.log
