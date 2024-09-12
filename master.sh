@@ -8,13 +8,16 @@ sudo apt upgrade -y
 sudo apt install -y apt-transport-https ca-certificates curl software-properties-common gnupg
 
 # Modify the needrestart configuration to auto-restart services after updates
-sudo sed -i 's/#$nrconf{restart} = '"'"'i'"'"';/$nrconf{restart} = '"'"'a'"'"';/g' /etc/needrestart/needrestart.conf
+sudo sed -i 's/#$nrconf{restart} = .*/$nrconf{restart} = "a";/' /etc/needrestart/needrestart.conf
 
-# Disable swap immediately (required by Kubernetes)
+# Disable swap immediately
 sudo swapoff -a
 
-# Remove or comment out any swap entry from /etc/fstab to disable it persistently
-sudo sed -i '/ swap / s/^/#/' /etc/fstab
+# Remove any existing swap file
+sudo rm -f /swap.img
+
+# Comment out any swap entry from /etc/fstab to prevent it from being enabled on reboot
+sudo sed -i '/swap/d' /etc/fstab
 
 # Verify that swap is disabled
 if free | grep -i swap | awk '{print $2}' | grep -q '^0$'; then
