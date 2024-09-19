@@ -88,6 +88,7 @@ EOF'
 # Clone repositories
 git clone https://github.com/PaloAltoNetworks/Kubernetes.git
 git clone https://github.com/janiax23/ridapp.git
+git clone https://github.com/janiax23/paloalto_manifests-k8s_service
 
 # Rename Kubernetes directory
 mv Kubernetes panw-k8manifests
