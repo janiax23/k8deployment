@@ -79,4 +79,14 @@ sudo bash -c 'cat <<EOF > /etc/hosts
 10.1.80.82 k8worker2
 EOF'
 
+# Create necessary directories under /mnt and set permissions and ownership for Palo Alto CN firewall
+sudo mkdir -p /mnt/pan-local{1..6}
+sudo chmod 755 /mnt/pan-local{1..6}
+sudo chown -R jan:jan /mnt/pan-local{1..6}
+
+# Create necessary directories under /var/log and set permissions and ownership
+sudo mkdir -p /var/log/pan-appinfo/pan-cni-ready
+sudo chmod 755 /var/log/pan-appinfo /var/log/pan-appinfo/pan-cni-ready
+sudo chown -R jan:jan /var/log/pan-appinfo
+
 echo "Worker node setup complete. Please join the cluster manually with 'kubeadm join'."
