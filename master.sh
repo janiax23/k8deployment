@@ -85,6 +85,13 @@ sudo bash -c 'cat <<EOF > /etc/hosts
 10.1.80.82 k8worker2
 EOF'
 
+# Clone repositories
+git clone https://github.com/PaloAltoNetworks/Kubernetes.git
+git clone https://github.com/janiax23/ridapp.git
+
+# Rename Kubernetes directory
+mv Kubernetes panw-k8manifests
+
 # Download and apply Calico network plugin
 wget https://raw.githubusercontent.com/projectcalico/calico/master/manifests/calico.yaml
 kubectl apply -f calico.yaml
